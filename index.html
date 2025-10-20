@@ -420,7 +420,8 @@
                 
                 // CSV 텍스트를 파싱(해석)
                 const lines = csvText.trim().split('\n');
-                const topics = lines.map(line => {
+                // [★수정★] .slice(1)을 추가하여 첫 번째 줄(제목)을 제외합니다.
+                const topics = lines.slice(1).map(line => { 
                     const [topic, url] = line.split(',');
                     return { topic: topic.trim(), url: url.trim() };
                 }).filter(item => item.topic && item.url); // 빈 줄이나 잘못된 데이터 필터링
@@ -594,5 +595,6 @@
 
 </body>
 </html>
+
 
 

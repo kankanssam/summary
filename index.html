@@ -434,7 +434,7 @@
             }
         }
 
-        // [수정] 주제 저장 (Google Apps Script로 전송)
+        // [수정] 주제 저장 (중복 확인 기능 추가)
         async function saveTopic() {
             const topic = document.getElementById('topicInput').value.trim();
             let url = document.getElementById('urlInput').value.trim();
@@ -451,10 +451,24 @@
             
             // 저장 버튼 비활성화 (중복 저장 방지)
             saveButton.disabled = true;
-            saveButton.textContent = '저장 중...';
+            saveButton.textContent = '중복 확인 중...';
 
             try {
-                // Apps Script로 보낼 데이터 (비밀번호 포함)
+                // --- [추가] 저장 전 중복 확인 ---
+                const topics = await getTopicsFromSheet(); // 현재 목록 가져오기
+                const isDuplicate = topics.some(item => item.url === url);
+
+                if (isDuplicate) {
+                    alert('이미 등록된 사이트 주소입니다.');
+                    saveButton.disabled = false;
+                    saveButton.textContent = '저장하기';
+                    return; // 함수 종료
+                }
+                // --- 중복 확인 끝 ---
+
+                saveButton.textContent = '저장 중...';
+
+                // Apps Script로 보낼 데이터
                 const dataToSend = {
                     password: '1004', 
                     topic: topic,
@@ -463,19 +477,15 @@
 
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    // [★수정★] 'no-cors' 모드 삭제
                     headers: {
-                        // [★수정★] GAS 호환성을 위해 'text/plain'으로 변경
                         'Content-Type': 'text/plain;charset=utf-8', 
                     },
-                    body: JSON.stringify(dataToSend), // 데이터는 JSON 문자열로 전송
+                    body: JSON.stringify(dataToSend), 
                 });
                 
-                // [★수정★] 서버로부터의 실제 응답(result)을 JSON으로 파싱
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // 저장이 성공했을 때
                     alert('저장되었습니다!');
                     
                     document.getElementById('topicInput').value = '';
@@ -485,12 +495,13 @@
                     loadSavedListForTeacher();
                     loadTopicsForTeacherPreview();
                 } else {
-                    // (예: 비밀번호 오류 등)
+                    // (Apps Script가 보낸 오류 메시지. 예: '비밀번호 오류')
                     throw new Error(result.message);
                 }
 
             } catch (error) {
                 console.error('저장 중 오류 발생:', error);
+                // (네트워크 오류 또는 Apps Script 오류 모두 여기서 표시)
                 alert('저장에 실패했습니다: ' + error.message);
             } finally {
                 // 버튼 다시 활성화
@@ -595,6 +606,7 @@
 
 </body>
 </html>
+
 
 
 

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정왕고 AI 기초 보조학습</title>
+    <style>
+        /* --- 기본 & 공통 스타일 --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            box-sizing: border-box; 
+            background-color: #f8f8f8; 
+            color: #555; 
+            font-size: 1.1rem; 
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        .page {
+            display: none; /* [수정] 모든 페이지는 기본적으로 숨김 */
+            padding: 25px; 
+            width: 100%;
+            min-height: 100vh; 
+            animation: fadeIn 0.5s; 
+        }
+
+        .page.active {
+            display: block; /* [수정] .active 클래스가 있는 페이지만 block으로 표시 */
+        }
+        
+        /* [수정] 학습자 페이지만큼은 active일 때 flex로 표시 (레이아웃 때문) */
+        #studentPage.active {
+            display: flex;
+        }
+
+
+        h1, h2, h3 {
+            color: #444; 
+            margin-bottom: 20px;
+        }
+        h1 { font-size: 2.5rem; } 
+        h2 { font-size: 2rem; }   
+        h3 { font-size: 1.6rem; } 
+
+
+        button {
+            display: inline-block;
+            padding: 15px 30px; 
+            margin: 12px 6px; 
+            font-size: 1.2rem; 
+            font-weight: bold;
+            color: white;
+            background-color: #87ceeb; 
+            border: none;
+            border-radius: 8px; 
+            cursor: pointer;
+            transition: background-color 0.3s ease; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+
+        button:hover {
+            background-color: #6ab5d3; 
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            max-width: 450px; 
+            padding: 12px; 
+            margin: 12px 0; 
+            font-size: 1.1rem; 
+            border: 1px solid #cce0eb; 
+            border-radius: 8px; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); 
+        }
+        
+        .home-button {
+            background-color: #b0c4de; 
+        }
+        .home-button:hover {
+            background-color: #9db2cc; 
+        }
+
+        /* --- 1. 홈 페이지 스타일 --- */
+        #homePage {
+            text-align: center;
+            padding-top: 120px; 
+        }
+        #homePage h1 {
+            font-size: 2.8rem; 
+            margin-bottom: 50px;
+            color: #333;
+            line-height: 1.4;
+        }
+        #homePage .button-container {
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+        }
+        #homePage button {
+            width: 85%; 
+            max-width: 350px; 
+        }
+        
+        @media (min-width: 600px) {
+            #homePage .button-container {
+                flex-direction: row; 
+            }
+             #homePage button {
+                width: auto;
+                min-width: 200px;
+            }
+        }
+
+
+        /* --- 2. 교사 페이지 스타일 --- */
+        #teacherPage {
+            max-width: 90%; /* [수정] 너비를 넓혀 미리보기를 포함할 수 있게 함 */
+            margin: 0 auto; 
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        #teacherTools {
+            margin-top: 30px; 
+            border-top: 2px solid #e0e0e0; 
+            padding-top: 25px; 
+        }
+
+        #teacherTools label {
+            display: block; 
+            margin-top: 18px; 
+            font-weight: 600; 
+            color: #444;
+            font-size: 1.15rem; 
+        }
+        #teacherTools label:first-of-type {
+            margin-top: 0; 
+        }
+        
+        #savedList li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #e0e0e0;
+            font-size: 1rem;
+            display: flex;
+            flex-wrap: wrap; /* [수정] 모바일에서 줄바꿈 허용 */
+            justify-content: space-between;
+            align-items: center;
+        }
+        #savedList li:last-child {
+            border-bottom: none;
+        }
+        #savedList button { 
+            background-color: #ff9999; 
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin: 5px 0 5px 15px; /* [수정] 마진 수정 */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #savedList button:hover {
+            background-color: #ff7f7f;
+        }
+
+
+        /* --- 3. 학습자 페이지 스타일 --- */
+        /* [수정] display:flex를 제거하고, active 상태일 때만 flex가 되도록 위에서 처리함 */
+        #studentPage {
+            padding: 0;
+            flex-direction: column; 
+            height: 100vh; 
+            background-color: #f0f5f8; 
+        }
+        
+        .student-header {
+            padding: 15px 25px; 
+            background: #e6f2f7; 
+            border-bottom: 1px solid #d4e8f2; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .student-header h3 {
+            margin: 0;
+            color: #444;
+        }
+
+        .student-container {
+            display: flex;
+            flex-direction: column; 
+            flex-grow: 1; 
+            overflow: hidden; 
+            background-color: #fff; 
+        }
+
+        .sidebar {
+            width: 100%;
+            height: 35vh; 
+            background: #e6f2f7; 
+            border-right: 1px solid #d4e8f2; 
+            overflow-y: auto; 
+            padding: 15px; 
+        }
+        
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar li {
+            padding: 15px 20px; 
+            cursor: pointer;
+            border-bottom: 1px solid #dbe9f0; 
+            font-size: 1.2rem; 
+            color: #555;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        
+        .sidebar li:hover, .sidebar li.active {
+            background-color: #d0e7f2; 
+            color: #333;
+        }
+        .sidebar li:last-child {
+            border-bottom: none;
+        }
+
+        .content-area {
+            width: 100%;
+            height: 65vh; 
+            flex-grow: 1; 
+            background-color: #fdfdfd;
+        }
+        
+        .content-area iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #fff;
+        }
+
+        /* --- 반응형 (데스크탑) --- */
+        @media (min-width: 768px) {
+            .student-container {
+                flex-direction: row; 
+            }
+
+            .sidebar {
+                flex-basis: 20%; 
+                min-width: 200px; 
+                height: auto; 
+            }
+
+            .content-area {
+                flex-basis: 80%; 
+                height: auto;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="homePage" class="page active">
+        <h1>정왕고등학교 인공지능기초 1학년<br>수업을 위한 보조학습 웹페이지입니다.</h1>
+        <div class="button-container">
+            <button onclick="showTeacherLogin()">👩‍🏫 교사용</button>
+            <button onclick="showStudentPage()">👨‍🎓 학습자</button>
+        </div>
+    </div>
+
+    <div id="teacherPage" class="page">
+        <h2>교사용 페이지</h2>
+        
+        <div id="loginSection">
+            <label for="passwordInput">비밀번호:</label>
+            <input type="password" id="passwordInput" placeholder="비밀번호를 입력하세요" onkeyup="checkEnter(event)">
+            <button onclick="login()">로그인</button>
+        </div>
+
+        <div id="teacherTools" style="display:none;">
+            <h3>학습 주제 추가</h3>
+            
+            <label for="topicInput">주제:</label>
+            <input type="text" id="topicInput" placeholder="예: 인공지능이란?">
+            
+            <label for="urlInput">사이트 주소:</label>
+            <input type="text" id="urlInput" placeholder="https://example.com">
+            
+            <button onclick="saveTopic()">저장하기</button>
+            <hr>
+            <h3>저장된 목록 (확인용)</h3>
+            <ul id="savedList"></ul>
+
+            <hr style="margin: 30px 0; border-style: dashed; border-color: #b0c4de;">
+            <h3 style="margin-top: 20px;">학습자 페이지 미리보기</h3>
+            <div class="student-container" style="height: 70vh; border: 2px solid #e6f2f7; border-radius: 8px;">
+                <nav class="sidebar">
+                    <ul id="topicListTeacher">
+                        <li>목록이 없습니다.</li>
+                    </ul>
+                </nav>
+                <main class="content-area">
+                    <iframe id="contentFrameTeacher" src="about:blank" title="학습 내용 미리보기"></iframe>
+                </main>
+            </div>
+            </div>
+        
+        <button class="home-button" onclick="goHome()">🏠 홈으로</button>
+    </div>
+
+    <div id="studentPage" class="page">
+        <header class="student-header">
+            <h3>학습 주제</h3>
+            <button class="home-button" onclick="goHome()">🏠 홈으로</button>
+        </header>
+
+        <div class="student-container">
+            <nav class="sidebar">
+                <ul id="topicList">
+                    <li>등록된 학습 주제가 없습니다.</li>
+                </ul>
+            </nav>
+
+            <main class="content-area">
+                <iframe id="contentFrame" src="about:blank" title="학습 내용"></iframe>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- 전역 변수 ---
+        const dbKey = 'jeongwangAiTopics'; 
+
+        // --- 페이지 네비게이션 ---
+
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function goHome() {
+            showPage('homePage');
+        }
+
+        function showTeacherLogin() {
+            showPage('teacherPage');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('teacherTools').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            
+            // [추가] 교사 페이지 로드 시, 관리자 목록과 미리보기 목록 모두 로드
+            loadSavedListForTeacher(); 
+            loadTopicsForTeacherPreview();
+        }
+
+        function showStudentPage() {
+            showPage('studentPage');
+            loadTopicsForStudent();
+            document.getElementById('contentFrame').src = 'about:blank';
+        }
+
+        // --- 2. 교사 페이지 기능 ---
+
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === '1004') {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('teacherTools').style.display = 'block';
+            } else {
+                alert('비밀번호가 틀렸습니다.');
+            }
+        }
+        
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        }
+
+        function getTopics() {
+            return JSON.parse(localStorage.getItem(dbKey)) || [];
+        }
+
+        function setTopics(topics) {
+            localStorage.setItem(dbKey, JSON.stringify(topics));
+        }
+
+        function saveTopic() {
+            const topic = document.getElementById('topicInput').value.trim();
+            let url = document.getElementById('urlInput').value.trim();
+
+            if (!topic || !url) {
+                alert('주제와 사이트 주소를 모두 입력해주세요.');
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+
+            const topics = getTopics();
+            topics.push({ topic: topic, url: url });
+            setTopics(topics);
+
+            alert('저장되었습니다!');
+            
+            document.getElementById('topicInput').value = '';
+            document.getElementById('urlInput').value = '';
+            
+            // [수정] 저장 시 관리자/미리보기 목록 둘 다 새로고침
+            loadSavedListForTeacher();
+            loadTopicsForTeacherPreview();
+        }
+
+        function loadSavedListForTeacher() {
+            const topics = getTopics();
+            const listElement = document.getElementById('savedList');
+            listElement.innerHTML = ''; 
+
+            if (topics.length === 0) {
+                listElement.innerHTML = '<li>저장된 항목이 없습니다.</li>';
+                return;
+            }
+
+            topics.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${item.topic} (${item.url}) `;
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '삭제';
+                // (스타일은 CSS에서 상속받도록 인라인 스타일 제거)
+                deleteButton.onclick = function() {
+                    deleteTopic(index);
+                };
+                
+                li.appendChild(deleteButton);
+                listElement.appendChild(li);
+            });
+        }
+        
+        function deleteTopic(indexToDelete) {
+            if (!confirm('정말로 이 항목을 삭제하시겠습니까?')) {
+                return;
+            }
+            const topics = getTopics();
+            topics.splice(indexToDelete, 1); 
+            setTopics(topics);
+
+            // [수정] 삭제 시 모든 목록 새로고침
+            loadSavedListForTeacher(); 
+            loadTopicsForStudent(); 
+            loadTopicsForTeacherPreview();
+        }
+
+
+        // --- 3. 학습자 페이지 기능 ---
+
+        function loadTopicsForStudent() {
+            const topics = getTopics();
+            const listElement = document.getElementById('topicList');
+            listElement.innerHTML = ''; 
+
+            if (topics.length === 0) {
+                listElement.innerHTML = '<li>등록된 학습 주제가 없습니다.</li>';
+                return;
+            }
+
+            topics.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item.topic;
+                
+                li.onclick = () => {
+                    loadUrlInIframe(item.url, li);
+                };
+                
+                listElement.appendChild(li);
+            });
+        }
+
+        function loadUrlInIframe(url, clickedLi) {
+            document.getElementById('contentFrame').src = url;
+            
+            const allLis = document.querySelectorAll('#topicList li');
+            allLis.forEach(li => li.classList.remove('active'));
+            clickedLi.classList.add('active');
+        }
+
+        // --- [추가] 4. 교사용 미리보기 기능 ---
+
+        // (교사용) 미리보기 주제 목록 불러오기
+        function loadTopicsForTeacherPreview() {
+            const topics = getTopics();
+            const listElement = document.getElementById('topicListTeacher'); // ID 다름
+            listElement.innerHTML = ''; 
+
+            if (topics.length === 0) {
+                listElement.innerHTML = '<li>등록된 학습 주제가 없습니다.</li>';
+                return;
+            }
+
+            topics.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item.topic;
+                
+                li.onclick = () => {
+                    loadUrlInIframeTeacher(item.url, li); // 다른 함수 호출
+                };
+                
+                listElement.appendChild(li);
+            });
+        }
+
+        // (교사용) 미리보기 iframe에 선택된 URL 로드
+        function loadUrlInIframeTeacher(url, clickedLi) {
+            document.getElementById('contentFrameTeacher').src = url; // ID 다름
+            
+            const allLis = document.querySelectorAll('#topicListTeacher li'); // ID 다름
+            allLis.forEach(li => li.classList.remove('active'));
+            clickedLi.classList.add('active');
+        }
+
+
+        // --- 초기화 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('homePage');
+        });
+    </script>
+
+</body>
+</html>

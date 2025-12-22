@@ -37,7 +37,6 @@
             display: flex;
         }
 
-
         h1, h2, h3 {
             color: #444; 
             margin-bottom: 20px;
@@ -45,7 +44,6 @@
         h1 { font-size: 2.5rem; } 
         h2 { font-size: 2rem; }   
         h3 { font-size: 1.6rem; } 
-
 
         button {
             display: inline-block;
@@ -90,6 +88,26 @@
             background-color: #9db2cc; 
         }
 
+        /* --- 방문자 수 표시 스타일 --- */
+        .visitor-stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+            border: 1px solid #eef2f5;
+        }
+        .visitor-stats b {
+            color: #87ceeb;
+            margin-left: 5px;
+            margin-right: 10px;
+        }
+
         /* --- 1. 홈 페이지 스타일 --- */
         #homePage {
             text-align: center;
@@ -132,7 +150,6 @@
             color: #aaa;       
         }
 
-
         /* --- 2. 교사 페이지 스타일 --- */
         #teacherPage {
             max-width: 90%; 
@@ -147,7 +164,6 @@
             border-top: 2px solid #e0e0e0; 
             padding-top: 25px; 
         }
-
         #teacherTools label {
             display: block; 
             margin-top: 18px; 
@@ -155,10 +171,6 @@
             color: #444;
             font-size: 1.15rem; 
         }
-        #teacherTools label:first-of-type {
-            margin-top: 0; 
-        }
-        
         #savedList li {
             padding: 10px 0;
             border-bottom: 1px dashed #e0e0e0;
@@ -168,10 +180,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        #savedList li:last-child {
-            border-bottom: none;
-        }
-        
 
         /* --- 3. 학습자 페이지 스타일 --- */
         #studentPage {
@@ -180,7 +188,6 @@
             height: 100vh; 
             background-color: #f0f5f8; 
         }
-        
         .student-header {
             padding: 15px 25px; 
             background: #e6f2f7; 
@@ -190,11 +197,6 @@
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .student-header h3 {
-            margin: 0;
-            color: #444;
-        }
-
         .student-container {
             display: flex;
             flex-direction: column; 
@@ -202,7 +204,6 @@
             overflow: hidden; 
             background-color: #fff; 
         }
-
         .sidebar {
             width: 100%;
             height: 35vh; 
@@ -211,50 +212,14 @@
             overflow-y: auto; 
             padding: 15px; 
         }
-        
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        /* --- [수정됨] 사이드바 목록 스타일 (아코디언) --- */
-        .sidebar li { /* <li> wrapper */
-            padding: 0; 
-            cursor: default;
-            border-bottom: 1px solid #dbe9f0; /* 단원 구분선 */
-            font-size: 1.2rem; 
-            color: #555;
-            transition: none;
-        }
-        
-        .sidebar li:hover, .sidebar li.active { /* 기존 hover, active 제거 */
-            background-color: transparent; 
-            color: #555;
-        }
-        .sidebar li:last-child {
-            border-bottom: none;
-        }
-
-        /* "목록 없음" 메시지 스타일 */
-        .sidebar ul > li:only-child {
-             padding: 15px 20px;
-        }
-
-        /* 단원 제목 (클릭 영역) */
         .sidebar .unit-title {
             padding: 15px 20px;
             cursor: pointer;
             font-weight: bold;
             color: #444;
-            transition: background-color 0.2s ease;
-            position: relative; /* 화살표 위치 기준 */
+            position: relative;
+            border-bottom: 1px solid #dbe9f0;
         }
-        .sidebar .unit-title:hover {
-            background-color: #dceef7;
-        }
-        
-        /* 단원 제목 화살표 */
         .sidebar .unit-title::after {
             content: '▼';
             font-size: 0.8rem;
@@ -262,86 +227,50 @@
             right: 20px;
             top: 50%;
             transform: translateY(-50%) scaleX(1.2);
-            transition: transform 0.2s ease;
         }
-        
-        /* 열렸을 때 화살표 (JS에서 .open 클래스 추가) */
-        .sidebar .unit-title.open::after {
-            transform: translateY(-50%) scaleX(1.2) rotate(180deg);
-        }
-
-        /* 주제 부목록 (숨겨진 UL) */
         .sidebar .topic-sublist {
             list-style: none;
             padding: 0;
             margin: 0;
-            display: none; /* 기본 숨김 */
-            background-color: #f7fcff; /* 약간 다른 배경색 */
+            display: none;
+            background-color: #f7fcff;
         }
-        .sidebar .topic-sublist.visible {
-            display: block; /* JS에서 .visible 클래스 추가 */
-        }
-
-        /* 주제 항목 (실제 클릭 LI) */
+        .sidebar .topic-sublist.visible { display: block; }
         .sidebar .topic-item {
-            padding: 15px 20px 15px 35px; /* 들여쓰기 */
+            padding: 15px 20px 15px 35px;
             cursor: pointer;
-            border-top: 1px solid #eaf3f7; /* 주제 간 구분선 */
-            font-size: 1.1rem; /* 단원보다 약간 작게 */
-            color: #555;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            border-top: 1px solid #eaf3f7;
+            font-size: 1.1rem;
         }
-        
-        /* 주제 항목 호버/활성 */
-        .sidebar .topic-item:hover, 
-        .sidebar .topic-item.active {
+        .sidebar .topic-item:hover, .sidebar .topic-item.active {
             background-color: #d0e7f2; 
-            color: #333;
         }
-        /* --- [수정] 끝 --- */
-
-
         .content-area {
             width: 100%;
             height: 65vh; 
-            flex-grow: 1; 
             background-color: #fdfdfd;
         }
-        
         .content-area iframe {
             width: 100%;
             height: 100%;
             border: none;
-            background-color: #fff;
         }
 
-        /* --- 반응형 (데스크탑) --- */
         @media (min-width: 768px) {
-            .student-container {
-                flex-direction: row; 
-            }
-
-            .sidebar {
-                flex-basis: 20%; 
-                min-width: 200px; 
-                height: auto; 
-            }
-
-            .content-area {
-                flex-basis: 80%; 
-                height: auto;
-            }
+            .student-container { flex-direction: row; }
+            .sidebar { flex-basis: 20%; min-width: 200px; height: auto; }
+            .content-area { flex-basis: 80%; height: auto; }
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="homePage" class="page active">
+        <div class="visitor-stats">
+            오늘 <b id="todayCount">0</b> 전체 <b id="totalCount">0</b>
+        </div>
+
         <h1>정왕고등학교 1학년 인공지능기초 과목<br>수업을 위한 보조학습 웹페이지입니다.</h1>
         <div class="button-container">
             <button onclick="showTeacherLogin()">👩‍🏫 교사용</button>
@@ -352,48 +281,28 @@
             © 2025 정왕고등학교. All rights reserved.<br>
             Developed by 김관동/한진우
         </div>
-        </div>
+    </div>
 
     <div id="teacherPage" class="page">
         <h2>교사용 페이지</h2>
-        
         <div id="loginSection">
             <label for="passwordInput">비밀번호:</label>
             <input type="password" id="passwordInput" placeholder="비밀번호를 입력하세요" onkeyup="checkEnter(event)">
             <button onclick="login()">로그인</button>
         </div>
-
         <div id="teacherTools" style="display:none;">
             <h3>학습 주제 추가</h3>
-            
             <label for="unitInput">단원:</label>
             <input type="text" id="unitInput" placeholder="예: 1단원">
-
             <label for="topicInput">주제:</label>
             <input type="text" id="topicInput" placeholder="예: 프로젝트명">
-            
             <label for="urlInput">사이트 주소:</label>
             <input type="text" id="urlInput" placeholder="https://example.com">
-            
             <button id="saveButton" onclick="saveTopic()">저장하기</button>
             <hr>
             <h3>저장된 목록 (확인용)</h3>
             <ul id="savedList"></ul>
-
-            <hr style="margin: 30px 0; border-style: dashed; border-color: #b0c4de;">
-            <h3 style="margin-top: 20px;">학습자 페이지 미리보기</h3>
-            <div class="student-container" style="height: 70vh; border: 2px solid #e6f2f7; border-radius: 8px;">
-                <nav class="sidebar">
-                    <ul id="topicListTeacher">
-                        <li>목록이 없습니다.</li>
-                    </ul>
-                </nav>
-                <main class="content-area">
-                    <iframe id="contentFrameTeacher" src="about:blank" title="학습 내용 미리보기"></iframe>
-                </main>
-            </div>
         </div>
-        
         <button class="home-button" onclick="goHome()">🏠 홈으로</button>
     </div>
 
@@ -402,364 +311,149 @@
             <h3>학습 주제</h3>
             <button class="home-button" onclick="goHome()">🏠 홈으로</button>
         </header>
-
         <div class="student-container">
-            <nav class="sidebar">
-                <ul id="topicList">
-                    <li>등록된 학습 주제가 없습니다.</li>
-                </ul>
-            </nav>
-
-            <main class="content-area">
-                <iframe id="contentFrame" src="about:blank" title="학습 내용"></iframe>
-            </main>
+            <nav class="sidebar"><ul id="topicList"><li>등록된 주제가 없습니다.</li></ul></nav>
+            <main class="content-area"><iframe id="contentFrame" src="about:blank"></iframe></main>
         </div>
     </div>
 
     <script>
-        // --- [★추가★] 교사 인증 후 비밀번호를 임시 저장할 변수 ---
-        // 로그인 성공 시에만 채워집니다.
-    let teacherPassword = null;
-        // --- 전역 변수: Google Sheets URL ---
-
-        // [★중요★] 1단계에서 복사한 '웹 앱 URL'을 여기에 붙여넣으세요.
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHrtR-_pi920LXotgh2x7l-vpRqwxOF3r2SkCD2bx9swabCB7lFnMvqYuGuKTSAEQMLg/exec";
-
-        // [★중요★] 2단계에서 복사한 'CSV URL'을 여기에 붙여넣으세요.
+        let teacherPassword = null;
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxxsvBgBmhYV2Y24TGmPv1yPCdbIaFE_qyzLJVd7vhHf1WSgnpemcAayFBlhp-DH2xxQ/exec";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5H6Tgsns5_cRyLmGHsit2NLCK615SdmsDOX2IYQXoW_q6WNT0OoYNzT_ou4LNw0U1ADo-CX9oTs4H/pub?gid=0&single=true&output=csv";
 
+        // 방문자 수 업데이트 함수
+        async function updateVisitorStats() {
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'visit' })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById('todayCount').textContent = result.today;
+                    document.getElementById('totalCount').textContent = result.total;
+                }
+            } catch (e) { console.error("방문자 데이터 로드 실패", e); }
+        }
 
-        // --- 페이지 네비게이션 ---
+        // 페이지 초기 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('homePage');
+            updateVisitorStats();
+        });
 
         function showPage(pageId) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
         }
 
-        function goHome() {
-            showPage('homePage');
-        }
+        function goHome() { showPage('homePage'); updateVisitorStats(); }
 
-        function showTeacherLogin() {
-            showPage('teacherPage');
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('teacherTools').style.display = 'none';
-            document.getElementById('passwordInput').value = '';
-            
-            loadSavedListForTeacher(); 
-            loadTopicsForTeacherPreview();
-        }
-
-        function showStudentPage() {
-            showPage('studentPage');
-            loadTopicsForStudent();
-            document.getElementById('contentFrame').src = 'about:blank';
-        }
-
-        // --- 2. 교사 페이지 기능 ---
-        // [★수정★] 로그인 기능을 서버(Apps Script)에 요청
         async function login() {
-            const password = document.getElementById('passwordInput').value;
-            const loginButton = document.querySelector('#loginSection button'); // 버튼 선택
-
-            if (!password) {
-                alert('비밀번호를 입력하세요.');
-                return;
-            }
-
-            // 버튼 비활성화 (중복 클릭 방지)
-            loginButton.disabled = true;
-            loginButton.textContent = '확인 중...';
-
+            const pw = document.getElementById('passwordInput').value;
+            const btn = document.querySelector('#loginSection button');
+            btn.disabled = true; btn.textContent = '확인 중...';
             try {
-                const response = await fetch(WEB_APP_URL, {
+                const res = await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8',
-                    },
-                    body: JSON.stringify({
-                        action: 'login', // Apps Script가 '로그인 요청'임을 알도록 함
-                        password: password // 사용자가 입력한 비밀번호 전송
-                    }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'login', password: pw })
                 });
-
-                const result = await response.json();
-
+                const result = await res.json();
                 if (result.status === 'success') {
-                    // [★중요★] 로그인 성공! 
-                    // 입력했던 비밀번호를 임시 변수에 저장합니다. (저장 기능에 사용)
-                    teacherPassword = password; 
-
-                    // 교사 도구 표시
+                    teacherPassword = pw;
                     document.getElementById('loginSection').style.display = 'none';
                     document.getElementById('teacherTools').style.display = 'block';
-                } else {
-                    // 로그인 실패
-                    teacherPassword = null; // 변수 초기화
-                    alert(result.message || '비밀번호가 틀렸습니다.');
-                }
-
-            } catch (error) {
-                console.error('로그인 중 오류 발생:', error);
-                teacherPassword = null; // 변수 초기화
-                alert('로그인 중 오류가 발생했습니다. ' + error.message);
-            } finally {
-                // 버튼 다시 활성화
-                loginButton.disabled = false;
-                loginButton.textContent = '로그인';
-            }
+                    loadSavedListForTeacher();
+                } else { alert('비밀번호가 틀렸습니다.'); }
+            } catch (e) { alert('오류 발생'); }
+            finally { btn.disabled = false; btn.textContent = '로그인'; }
         }
 
-        function checkEnter(event) {
-            if (event.key === 'Enter') {
-                login();
-            }
-        }
-
-        // [수정] Google Sheets에서 데이터 읽어오는 공통 함수
         async function getTopicsFromSheet() {
             try {
-                        const response = await fetch(SHEET_CSV_URL + '&_cacheBust=' + new Date().getTime(), { cache: 'no-cache' });
-                        if (!response.ok) {
-                            throw new Error('네트워크 응답이 올바르지 않습니다.');
-                        }
-                        const csvText = await response.text();
-                
-                        const lines = csvText.trim().split('\n');
-                
-                        // [★수정★] 첫 번째 줄(제목) 제외하고, 3개 항목(unit, topic, url) 파싱
-                        const topics = lines.slice(1).map(line => { 
-                            const [unit, topic, url] = line.split(',');
-                            // 데이터가 없는 경우를 대비해 trim() 전에 확인
-                            return { 
-                                unit: unit ? unit.trim() : '', 
-                                topic: topic ? topic.trim() : '', 
-                                url: url ? url.trim() : '' 
-                            };
-                        }).filter(item => item.unit && item.topic && item.url); // 3개 모두 있어야 함
-                
-                        return topics;
+                const res = await fetch(SHEET_CSV_URL + '&_t=' + Date.now());
+                const csv = await res.text();
+                return csv.trim().split('\n').slice(1).map(line => {
+                    const [unit, topic, url] = line.split(',');
+                    return { unit: unit?.trim(), topic: topic?.trim(), url: url?.trim() };
+                }).filter(i => i.unit && i.topic);
+            } catch (e) { return []; }
+        }
 
-                    } catch (error) {
-                        console.error('데이터를 불러오는 중 오류 발생:', error);
-                        return []; 
-                    }
-                }
+        async function saveTopic() {
+            const unit = document.getElementById('unitInput').value.trim();
+            const topic = document.getElementById('topicInput').value.trim();
+            let url = document.getElementById('urlInput').value.trim();
+            if(!unit || !topic || !url) return alert('모두 입력하세요.');
+            if(!url.includes('://')) url = 'https://' + url;
 
-                // [★수정★] 주제 저장 (단원 추가 및 중복 확인)
-                async function saveTopic() {
-                    // ... (unit, topic, url, saveButton 변수 선언은 기존과 동일) ...
-                    const unit = document.getElementById('unitInput').value.trim();
-                    const topic = document.getElementById('topicInput').value.trim();
-                    let url = document.getElementById('urlInput').value.trim();
-            const saveButton = document.getElementById('saveButton');
-        
-            // [★중요★] 로그인 시 저장된 비밀번호가 있는지 확인
-            if (!teacherPassword) {
-                alert('인증 정보가 없습니다. 페이지를 새로고침하고 다시 로그인해주세요.');
-                return;
-            }
-
-            // ... (유효성 검사, URL 'https://' 추가 등은 기존과 동일) ...
-            if (!unit || !topic || !url) {
-                alert('단원, 주제, 사이트 주소를 모두 입력해주세요.');
-                return;
-            }
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-            }
-
-            saveButton.disabled = true;
-            saveButton.textContent = '중복 확인 중...';
+            const btn = document.getElementById('saveButton');
+            btn.disabled = true; btn.textContent = '저장 중...';
 
             try {
-                // ... (중복 확인 로직은 기존과 동일) ...
-                const topics = await getTopicsFromSheet(); 
-                const isDuplicate = topics.some(item => item.url === url);
-                if (isDuplicate) {
-                    alert('이미 등록된 사이트 주소입니다.');
-                    saveButton.disabled = false;
-                    saveButton.textContent = '저장하기';
-                    return; 
-                }
-
-                saveButton.textContent = '저장 중...';
-
-                // [★수정★] Apps Script로 보낼 데이터에 '1004' 대신 로그인 성공 시 저장한 'teacherPassword' 변수 사용
-                const dataToSend = {
-                    password: teacherPassword, // <--- 이 부분이 수정되었습니다!
-                    unit: unit,
-                    topic: topic,
-                    url: url
-                };
-
-                // ... (fetch 이하 저장 로직은 기존과 동일) ...
-                const response = await fetch(WEB_APP_URL, {
+                const res = await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', 
-                    },
-                    body: JSON.stringify(dataToSend), 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ password: teacherPassword, unit, topic, url })
                 });
-
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    alert('저장되었습니다!');
+                const result = await res.json();
+                if(result.status === 'success') {
+                    alert('저장완료');
                     document.getElementById('unitInput').value = '';
                     document.getElementById('topicInput').value = '';
                     document.getElementById('urlInput').value = '';
-
                     loadSavedListForTeacher();
-                    loadTopicsForTeacherPreview();
-                } else {
-                    // 서버에서 보낸 에러 메시지 (예: 인증 실패) 표시
-                    throw new Error(result.message || '알 수 없는 오류');
                 }
-
-            } catch (error) {
-                console.error('저장 중 오류 발생:', error);
-                alert('저장에 실패했습니다: ' + error.message);
-            } finally {
-                saveButton.disabled = false;
-                saveButton.textContent = '저장하기';
-            }
+            } catch(e) { alert('에러'); }
+            finally { btn.disabled = false; btn.textContent = '저장하기'; }
         }
-        
-        // [★수정★] 교사용 목록 불러오기 (DB에서, 3단 구조로)
+
         async function loadSavedListForTeacher() {
             const topics = await getTopicsFromSheet();
-            const listElement = document.getElementById('savedList');
-            listElement.innerHTML = ''; 
-
-            if (topics.length === 0) {
-                listElement.innerHTML = '<li>저장된 항목이 없습니다.</li>';
-                return;
-            }
-
-            topics.forEach((item, index) => {
-                const li = document.createElement('li');
-                // [★수정★] 단원, 주제, URL 표시
-                li.textContent = `[${item.unit}] ${item.topic} (${item.url})`;
-                listElement.appendChild(li);
-            });
+            const list = document.getElementById('savedList');
+            list.innerHTML = topics.map(i => `<li>[${i.unit}] ${i.topic}</li>`).join('');
         }
-        
-        // [추가] 읽어온 데이터를 단원(unit)별로 그룹화하는 헬퍼 함수
-        function groupTopicsByUnit(topics) {
-            // Map: { "단원1" => [ {topic, url}, {topic, url} ], "단원2" => [ ... ] }
+
+        async function showStudentPage() {
+            showPage('studentPage');
+            const topics = await getTopicsFromSheet();
+            const list = document.getElementById('topicList');
+            list.innerHTML = '';
+            
             const grouped = new Map();
-            topics.forEach(item => {
-                if (!grouped.has(item.unit)) {
-                    grouped.set(item.unit, []); // 새 단원이면 빈 배열 생성
-                }
-                // 해당 단원 배열에 {주제, URL} 객체 추가
-                grouped.get(item.unit).push({ topic: item.topic, url: item.url });
+            topics.forEach(t => {
+                if(!grouped.has(t.unit)) grouped.set(t.unit, []);
+                grouped.get(t.unit).push(t);
             });
-            return grouped;
-        }
 
-        // [★수정★] 아코디언 UI를 생성하는 공통 함수
-        // (Student, Teacher Preview가 공통으로 사용)
-        function createAccordionMenu(listElementId, topics, iframeLoader) {
-            const listElement = document.getElementById(listElementId);
-            listElement.innerHTML = ''; 
-
-            const groupedTopics = groupTopicsByUnit(topics);
-
-            if (groupedTopics.size === 0) {
-                listElement.innerHTML = '<li>등록된 학습 주제가 없습니다.</li>';
-                return;
-            }
-
-            groupedTopics.forEach((topicItems, unitName) => {
-                // 1. 전체를 감싸는 <li> (구조용)
-                const wrapperLi = document.createElement('li');
-                
-                // 2. 단원 제목 <div> (클릭 대상)
-                const unitDiv = document.createElement('div');
-                unitDiv.className = 'unit-title';
-                unitDiv.textContent = unitName;
-                
-                // 3. 주제 목록 <ul> (숨김/표시 대상)
-                const subList = document.createElement('ul');
-                subList.className = 'topic-sublist';
-
-                // 4. 단원 제목 클릭 시 토글 기능
-                unitDiv.onclick = () => {
-                    subList.classList.toggle('visible'); // 주제 목록 숨김/표시
-                    unitDiv.classList.toggle('open');   // 화살표 방향 변경
-                };
-
-                // 5. 주제 목록 (<li>) 생성
-                topicItems.forEach(item => {
-                    const topicLi = document.createElement('li');
-                    topicLi.className = 'topic-item'; // 스타일 및 선택용 클래스
-                    topicLi.textContent = item.topic;
-                    
-                    topicLi.onclick = (e) => {
-                        e.stopPropagation(); // 단원(부모)의 클릭 이벤트 방지
-                        iframeLoader(item.url, topicLi); // 
+            grouped.forEach((items, unit) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<div class="unit-title">${unit}</div>`;
+                const sub = document.createElement('ul');
+                sub.className = 'topic-sublist';
+                items.forEach(item => {
+                    const itemLi = document.createElement('li');
+                    itemLi.className = 'topic-item';
+                    itemLi.textContent = item.topic;
+                    itemLi.onclick = () => {
+                        document.getElementById('contentFrame').src = item.url;
+                        document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
+                        itemLi.classList.add('active');
                     };
-                    
-                    subList.appendChild(topicLi);
+                    sub.appendChild(itemLi);
                 });
-
-                wrapperLi.appendChild(unitDiv);
-                wrapperLi.appendChild(subList);
-                listElement.appendChild(wrapperLi);
+                li.querySelector('.unit-title').onclick = () => {
+                    sub.classList.toggle('visible');
+                    li.querySelector('.unit-title').classList.toggle('open');
+                };
+                li.appendChild(sub);
+                list.appendChild(li);
             });
         }
-
-
-        // --- 3. 학습자 페이지 기능 (DB에서) ---
-
-        // [★수정★] 학습자 목록 (아코디언)
-        async function loadTopicsForStudent() {
-            const topics = await getTopicsFromSheet();
-            createAccordionMenu('topicList', topics, loadUrlInIframe);
-        }
-
-        // [★수정★] 활성 항목(topic-item) 표시에 사용
-        function loadUrlInIframe(url, clickedLi) {
-            document.getElementById('contentFrame').src = url;
-            
-            // [★수정★] .topic-item만 선택하여 active 클래스 관리
-            const allLis = document.querySelectorAll('#topicList .topic-item');
-            allLis.forEach(li => li.classList.remove('active'));
-            clickedLi.classList.add('active');
-        }
-
-        // --- 4. 교사용 미리보기 기능 (DB에서) ---
-
-        // [★수정★] 교사 미리보기 (아코디언)
-        async function loadTopicsForTeacherPreview() {
-            const topics = await getTopicsFromSheet();
-            createAccordionMenu('topicListTeacher', topics, loadUrlInIframeTeacher);
-        }
-
-        // [★수정★] 활성 항목(topic-item) 표시에 사용
-        function loadUrlInIframeTeacher(url, clickedLi) {
-            document.getElementById('contentFrameTeacher').src = url; 
-            
-            // [★수정★] .topic-item만 선택하여 active 클래스 관리
-            const allLis = document.querySelectorAll('#topicListTeacher .topic-item'); 
-            allLis.forEach(li => li.classList.remove('active'));
-            clickedLi.classList.add('active');
-        }
-
-
-        // --- 초기화 ---
-        document.addEventListener('DOMContentLoaded', () => {
-            showPage('homePage');
-        });
+        function checkEnter(e) { if(e.key === 'Enter') login(); }
     </script>
-
 </body>
 </html>
-
-
-

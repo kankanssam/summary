@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>정왕고 AI 기초 보조학습</title>
+    <title>인공지능기초 과목 보조자료</title>
     <style>
         /* --- 기본 & 공통 스타일 --- */
         body, html {
@@ -236,6 +236,7 @@
             background-color: #f7fcff;
         }
         .sidebar .topic-sublist.visible { display: block; }
+        
         .sidebar .topic-item {
             padding: 15px 20px 15px 35px;
             cursor: pointer;
@@ -262,6 +263,36 @@
             .content-area { flex-basis: 80%; height: auto; }
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- 커스텀 토스트 알림 (alert 대체용) --- */
+        #toastMessage {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #toastMessage.show {
+            visibility: visible;
+            animation: fadeinToast 0.5s, fadeoutToast 0.5s 2.5s;
+        }
+        @keyframes fadeinToast {
+            from { bottom: 0; opacity: 0; } 
+            to { bottom: 30px; opacity: 1; }
+        }
+        @keyframes fadeoutToast {
+            from { bottom: 30px; opacity: 1; } 
+            to { bottom: 0; opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -273,6 +304,7 @@
 
         <h1>정왕고등학교 1학년 인공지능기초 과목<br>수업을 위한 보조학습 웹페이지입니다.</h1>
         <div class="button-container">
+            <!-- 오류의 원인이었던 showTeacherLogin() 함수가 연결된 버튼 -->
             <button onclick="showTeacherLogin()">👩‍🏫 교사용</button>
             <button onclick="showStudentPage()">👨‍🎓 학습자</button>
         </div>
@@ -317,10 +349,23 @@
         </div>
     </div>
 
+    <!-- 토스트 알림을 위한 요소 추가 -->
+    <div id="toastMessage"></div>
+
     <script>
         let teacherPassword = null;
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxxsvBgBmhYV2Y24TGmPv1yPCdbIaFE_qyzLJVd7vhHf1WSgnpemcAayFBlhp-DH2xxQ/exec";
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5H6Tgsns5_cRyLmGHsit2NLCK615SdmsDOX2IYQXoW_q6WNT0OoYNzT_ou4LNw0U1ADo-CX9oTs4H/pub?gid=0&single=true&output=csv";
+
+        // 시스템 제한사항(alert 사용 금지)에 맞춘 커스텀 알림 함수
+        function showMessage(msg) {
+            const toast = document.getElementById("toastMessage");
+            toast.textContent = msg;
+            toast.className = "show";
+            setTimeout(function() { 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
 
         // 방문자 수 업데이트 함수
         async function updateVisitorStats() {
@@ -349,7 +394,21 @@
             document.getElementById(pageId).classList.add('active');
         }
 
-        function goHome() { showPage('homePage'); updateVisitorStats(); }
+        function goHome() { 
+            showPage('homePage'); 
+            updateVisitorStats(); 
+        }
+
+        // [수정된 부분] 누락되었던 교사용 로그인 페이지 표시 함수 추가
+        function showTeacherLogin() {
+            showPage('teacherPage');
+            // 아직 로그인 전이라면 로그인 폼을 보여주고, 도구는 숨깁니다.
+            if (!teacherPassword) {
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('teacherTools').style.display = 'none';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
 
         async function login() {
             const pw = document.getElementById('passwordInput').value;
@@ -367,8 +426,12 @@
                     document.getElementById('loginSection').style.display = 'none';
                     document.getElementById('teacherTools').style.display = 'block';
                     loadSavedListForTeacher();
-                } else { alert('비밀번호가 틀렸습니다.'); }
-            } catch (e) { alert('오류 발생'); }
+                } else { 
+                    showMessage('비밀번호가 틀렸습니다.'); // alert 대체
+                }
+            } catch (e) { 
+                showMessage('오류 발생'); // alert 대체
+            }
             finally { btn.disabled = false; btn.textContent = '로그인'; }
         }
 
@@ -387,7 +450,11 @@
             const unit = document.getElementById('unitInput').value.trim();
             const topic = document.getElementById('topicInput').value.trim();
             let url = document.getElementById('urlInput').value.trim();
-            if(!unit || !topic || !url) return alert('모두 입력하세요.');
+            
+            if(!unit || !topic || !url) {
+                showMessage('모두 입력하세요.'); // alert 대체
+                return;
+            }
             if(!url.includes('://')) url = 'https://' + url;
 
             const btn = document.getElementById('saveButton');
@@ -401,13 +468,15 @@
                 });
                 const result = await res.json();
                 if(result.status === 'success') {
-                    alert('저장완료');
+                    showMessage('저장완료'); // alert 대체
                     document.getElementById('unitInput').value = '';
                     document.getElementById('topicInput').value = '';
                     document.getElementById('urlInput').value = '';
                     loadSavedListForTeacher();
                 }
-            } catch(e) { alert('에러'); }
+            } catch(e) { 
+                showMessage('에러가 발생했습니다.'); // alert 대체
+            }
             finally { btn.disabled = false; btn.textContent = '저장하기'; }
         }
 
@@ -453,7 +522,10 @@
                 list.appendChild(li);
             });
         }
-        function checkEnter(e) { if(e.key === 'Enter') login(); }
+        
+        function checkEnter(e) { 
+            if(e.key === 'Enter') login(); 
+        }
     </script>
 </body>
 </html>
